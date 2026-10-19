@@ -1,0 +1,15 @@
+# API + N workers. Escale a produção com: docker compose up --scale worker=3
+services:
+  api:
+    build: { context: ., dockerfile: backend/Dockerfile }
+    env_file: backend/.env
+    ports: ["3333:3333"]
+    restart: unless-stopped
+
+  worker:
+    build: { context: ., dockerfile: backend/Dockerfile }
+    command: ["node", "dist/worker.js"]
+    env_file: backend/.env
+    environment:
+      WORK_DIR: /tmp/work
+    restart: unless-stopped
