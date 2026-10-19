@@ -13,6 +13,12 @@ class AgentLogModel {
     unwrap(result, 'agent_logs.write');
   }
 
+  /** Zera o console da fábrica (usado quando a API reinicia). */
+  async clear() {
+    const result = await this.db.delete().gte('id', 0);
+    unwrap(result, 'agent_logs.clear');
+  }
+
   async listRecent(filters: { video_id?: string; limit?: number; after_id?: number } = {}): Promise<AgentLog[]> {
     let query = this.db.select('*');
     if (filters.video_id) query = query.eq('video_id', filters.video_id);

@@ -38,10 +38,15 @@ export interface Channel {
   publish_times: string[];
   auto_produce: boolean;
   is_active: boolean;
+  avatar_path: string | null;
+  banner_path: string | null;
   youtube: { connected: boolean; title: string | null; configured: boolean };
 }
 
-export type ChannelInput = Partial<Omit<Channel, 'id' | 'youtube'>>;
+export type ChannelInput = Partial<Omit<Channel, 'id' | 'youtube' | 'avatar_path' | 'banner_path'>>;
+
+export type SuggestField = 'name' | 'niche' | 'description';
+export type BrandingKind = 'avatar' | 'banner';
 
 export interface Scene {
   id: string;

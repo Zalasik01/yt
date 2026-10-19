@@ -157,6 +157,42 @@ export async function assembleVideo({ clip_paths, audio_paths, work_dir, out_pat
   await ffmpeg(args);
 }
 
+export interface BrandingInput {
+  image_path: string;
+  kind: 'avatar' | 'banner';
+  /** Texto sobreposto (iniciais ou nome). Omitido quando a IA já desenha a arte. */
+  text?: string;
+  out_path: string;
+}
+
+/** Foto de perfil 800x800 ou banner 2560x1440 (área segura no centro). */
+export async function renderBranding({ image_path, kind, text, out_path }: BrandingInput): Promise<void> {
+  const [width, height, font_size] = kind === 'avatar' ? [800, 800, 340] : [2560, 1440, 170];
+  const filters = [
+    `scale=${width}:${height}:force_original_aspect_ratio=increase`,
+    `crop=${width}:${height}`,
+    'eq=contrast=1.1:saturation=1.15',
+    'vignette=PI/5',
+  ];
+  if (text) {
+    const ass_path = out_path.replace(/\.\w+$/, '.ass');
+    const style: AssStyle = {
+      width,
+      height,
+      font: env.SUBTITLE_FONT,
+      font_size,
+      outline: kind === 'avatar' ? 10 : 8,
+      alignment: 5,
+      margin_h: 80,
+      margin_v: 0,
+      primary_color: '&H0000E5FF',
+    };
+    await writeFile(ass_path, buildAss({ brand: style }, [{ start: 0, end: 10, text }]));
+    filters.push(`ass='${filterPath(ass_path)}'`);
+  }
+  await ffmpeg(['-i', image_path, '-vf', filters.join(','), '-frames:v', '1', '-q:v', '2', out_path]);
+}
+
 export interface ThumbnailInput {
   image_path: string;
   text: string;

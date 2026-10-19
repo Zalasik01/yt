@@ -11,12 +11,12 @@ interface PexelsSearch {
 export class PexelsImageProvider implements ImageProvider {
   readonly name = 'pexels';
 
-  async generate({ prompt, search_query, out_path, seed = 0 }: ImageRequest): Promise<void> {
+  async generate({ prompt, search_query, out_path, seed = 0, aspect = 'landscape' }: ImageRequest): Promise<void> {
     if (!env.PEXELS_API_KEY) throw new ProviderError('pexels', 'PEXELS_API_KEY não configurada');
     const query = search_query || prompt.split(/\s+/).slice(0, 5).join(' ');
     const url = new URL('https://api.pexels.com/v1/search');
     url.searchParams.set('query', query);
-    url.searchParams.set('orientation', 'landscape');
+    url.searchParams.set('orientation', aspect);
     url.searchParams.set('per_page', '10');
     const response = await fetchOrThrow('pexels', url.toString(), { headers: { authorization: env.PEXELS_API_KEY } });
     const json = (await response.json()) as PexelsSearch;

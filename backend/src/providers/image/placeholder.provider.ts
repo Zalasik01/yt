@@ -13,11 +13,12 @@ const PALETTES = [
 export class PlaceholderImageProvider implements ImageProvider {
   readonly name = 'placeholder';
 
-  async generate({ out_path, seed = 0 }: ImageRequest): Promise<void> {
+  async generate({ out_path, seed = 0, aspect = 'landscape' }: ImageRequest): Promise<void> {
     const [c0, c1] = PALETTES[seed % PALETTES.length]!;
+    const [width, height] = aspect === 'square' ? [1080, 1080] : [1920, 1080];
     await ffmpeg([
       '-f', 'lavfi',
-      '-i', `gradients=s=1920x1080:c0=${c0}:c1=${c1}:x0=0:y0=0:x1=1920:y1=1080:seed=${seed + 1}`,
+      '-i', `gradients=s=${width}x${height}:c0=${c0}:c1=${c1}:x0=0:y0=0:x1=${width}:y1=${height}:seed=${seed + 1}`,
       '-vf', 'noise=alls=8:allf=t,vignette=PI/4',
       '-frames:v', '1',
       out_path,

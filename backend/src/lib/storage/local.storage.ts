@@ -38,6 +38,10 @@ export class LocalStorageDriver implements StorageDriver {
     return { type: 'file' as const, path: absolute };
   }
 
+  async remove(remote_path: string): Promise<void> {
+    await rm(this.toAbsolute(remote_path), { force: true });
+  }
+
   async removePrefix(prefix: string): Promise<void> {
     await rm(this.toAbsolute(prefix), { recursive: true, force: true });
   }

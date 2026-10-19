@@ -1,13 +1,15 @@
 import { Router } from 'express';
 import { channel_controller } from '../controllers/channel.controller.js';
 import { validate } from '../middlewares/validate.js';
-import { CreateChannelBody, UpdateChannelBody } from '../validators/channel.validator.js';
+import { AiSuggestBody, BrandingParams, CreateChannelBody, UpdateChannelBody } from '../validators/channel.validator.js';
 import { IdParams } from '../validators/common.validator.js';
 
 export const channel_routes = Router();
 
 channel_routes.get('/', channel_controller.index);
 channel_routes.post('/', validate({ body: CreateChannelBody }), channel_controller.store);
+channel_routes.post('/ai/suggest', validate({ body: AiSuggestBody }), channel_controller.suggest);
+channel_routes.post('/:id/branding/:kind', validate({ params: BrandingParams }), channel_controller.generateBranding);
 channel_routes.get('/:id', validate({ params: IdParams }), channel_controller.show);
 channel_routes.patch('/:id', validate({ params: IdParams, body: UpdateChannelBody }), channel_controller.update);
 channel_routes.delete('/:id', validate({ params: IdParams }), channel_controller.destroy);

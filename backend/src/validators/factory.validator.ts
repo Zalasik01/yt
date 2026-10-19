@@ -7,5 +7,5 @@ export const LogsQuery = z.object({
 });
 
 export const MediaQuery = z.object({
-  path: z.string().regex(/^videos\/[0-9a-f-]{36}\/[\w./-]+$/, 'Caminho inválido').refine((value) => !value.includes('..')),
+  path: z.string().regex(/^(videos|channels)\/[0-9a-f-]{36}\/[\w./-]+$/, 'Caminho inválido').refine((value) => !value.includes('..')),
 });

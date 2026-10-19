@@ -20,6 +20,7 @@ api_v1.use(apiKeyAuth);
 api_v1.get('/meta/options', meta_controller.options);
 api_v1.get('/factory/status', factory_controller.status);
 api_v1.get('/factory/logs', validate({ query: LogsQuery }), factory_controller.logs);
+api_v1.delete('/factory/logs', factory_controller.clearLogs);
 api_v1.get('/media', validate({ query: MediaQuery }), media_controller.show);
 api_v1.use('/channels', channel_routes);
 api_v1.use('/videos', video_routes);

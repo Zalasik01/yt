@@ -37,5 +37,16 @@ export const UpdateChannelBody = ChannelFields.partial().refine((value) => Objec
   message: 'Informe ao menos um campo',
 });
 
+export const AiSuggestBody = z.object({
+  field: z.enum(['name', 'niche', 'description']),
+  name: z.string().trim().max(80).optional(),
+  niche: z.string().trim().max(300).optional(),
+  description: z.string().trim().max(2000).optional(),
+  language: z.string().max(10).optional(),
+  tone: z.string().max(300).optional(),
+});
+
+export const BrandingParams = z.object({ id: z.uuid(), kind: z.enum(['avatar', 'banner']) });
+
 export type CreateChannelInput = z.infer<typeof CreateChannelBody>;
 export type UpdateChannelInput = z.infer<typeof UpdateChannelBody>;

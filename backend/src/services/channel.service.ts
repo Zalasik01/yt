@@ -1,3 +1,4 @@
+import { storage } from '../lib/storage/index.js';
 import type { Channel, Insert, Update } from '../models/entities.js';
 import { channel_model } from '../models/channel.model.js';
 import { youtube_account_model } from '../models/youtube-account.model.js';
@@ -40,6 +41,7 @@ export class ChannelService {
   async remove(id: string): Promise<void> {
     await channel_model.getById(id);
     await channel_model.delete(id);
+    await storage.removePrefix(`channels/${id}`).catch(() => undefined);
   }
 
   async disconnectYoutube(id: string): Promise<void> {

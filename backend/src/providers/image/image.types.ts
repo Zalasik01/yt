@@ -4,6 +4,8 @@ export interface ImageRequest {
   out_path: string;
   /** Semente para variar resultados determinísticos (ex.: índice da cena). */
   seed?: number;
+  /** landscape (padrão, 16:9) ou square (foto de perfil do canal). */
+  aspect?: 'landscape' | 'square';
 }
 
 export interface ImageProvider {

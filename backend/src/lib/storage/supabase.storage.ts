@@ -34,6 +34,10 @@ export class SupabaseStorageDriver implements StorageDriver {
     return { type: 'redirect' as const, url: data.signedUrl };
   }
 
+  async remove(remote_path: string): Promise<void> {
+    await this.bucket.remove([remote_path]);
+  }
+
   async removePrefix(prefix: string): Promise<void> {
     const { data } = await this.bucket.list(prefix, { limit: 1000 });
     if (!data?.length) return;

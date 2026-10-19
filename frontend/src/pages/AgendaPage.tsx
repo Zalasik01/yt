@@ -3,11 +3,13 @@ import { useVideos } from '../api/hooks';
 import { mediaUrl } from '../api/client';
 import type { Short, Video } from '../api/types';
 import { VideoModal } from '../components/VideoModal';
+import { FadeIn } from '../components/ui/motion';
+import { Skeleton } from '../components/ui/Skeleton';
 
 type Entry = { at: string; kind: 'video' | 'short'; video: Video; short?: Short };
 
 export function AgendaPage() {
-  const { data: videos = [] } = useVideos({ status: ['approved', 'scheduled'], limit: 100 });
+  const { data: videos = [], isLoading } = useVideos({ status: ['approved', 'scheduled'], limit: 100 });
   const [open, setOpen] = useState<string | null>(null);
 
   const entries: Entry[] = videos
@@ -33,22 +35,40 @@ export function AgendaPage() {
           <p className="page-sub">O que vai ao ar e quando. O YouTube publica sozinho no horário.</p>
         </div>
       </div>
-      {entries.length === 0 && <div className="empty">Nada agendado ainda. Aprove um vídeo para ele entrar na agenda.</div>}
+      {isLoading && (
+        <section className="agenda-day">
+          <Skeleton width={160} height={12} style={{ marginBottom: 10 }} />
+          {Array.from({ length: 3 }, (_, index) => (
+            <div key={index} className="panel agenda-item">
+              <Skeleton width={48} height={14} />
+              <Skeleton width={120} height={68} radius={8} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                <Skeleton width="70%" />
+                <Skeleton width="30%" height={12} />
+              </div>
+              <Skeleton width={110} height={22} />
+            </div>
+          ))}
+        </section>
+      )}
+      {!isLoading && entries.length === 0 && <div className="empty">Nada agendado ainda. Aprove um vídeo para ele entrar na agenda.</div>}
       {[...by_day.entries()].map(([day, items]) => (
         <section key={day} className="agenda-day">
           <h3>{day}</h3>
-          {items.map((entry) => (
-            <div key={`${entry.kind}-${entry.short?.id ?? entry.video.id}`} className="panel agenda-item" onClick={() => setOpen(entry.video.id)} style={{ cursor: 'pointer' }}>
-              <span className="agenda-time">{new Date(entry.at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
-              {entry.video.thumbnail_path ? <img src={mediaUrl(entry.video.thumbnail_path)} alt="" /> : <span />}
-              <div>
-                <strong>{entry.kind === 'short' ? entry.short!.title : entry.video.title}</strong>
-                <div className="muted" style={{ fontSize: 13 }}>{entry.kind === 'short' ? 'Short' : 'Vídeo longo'}</div>
+          {items.map((entry, index) => (
+            <FadeIn key={`${entry.kind}-${entry.short?.id ?? entry.video.id}`} index={index}>
+              <div className="panel agenda-item" onClick={() => setOpen(entry.video.id)} style={{ cursor: 'pointer' }}>
+                <span className="agenda-time">{new Date(entry.at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</span>
+                {entry.video.thumbnail_path ? <img src={mediaUrl(entry.video.thumbnail_path)} alt="" /> : <span />}
+                <div>
+                  <strong>{entry.kind === 'short' ? entry.short!.title : entry.video.title}</strong>
+                  <div className="muted" style={{ fontSize: 13 }}>{entry.kind === 'short' ? 'Short' : 'Vídeo longo'}</div>
+                </div>
+                <span className={`tag ${entry.video.youtube_video_id ? 'tag-ok' : 'tag-warn'}`}>
+                  {entry.video.youtube_video_id ? 'no YouTube' : 'aguardando envio'}
+                </span>
               </div>
-              <span className={`tag ${entry.video.youtube_video_id ? 'tag-ok' : 'tag-warn'}`}>
-                {entry.video.youtube_video_id ? 'no YouTube' : 'aguardando envio'}
-              </span>
-            </div>
+            </FadeIn>
           ))}
         </section>
       ))}

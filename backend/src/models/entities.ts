@@ -33,6 +33,8 @@ export interface Channel {
   publish_times: string[];
   auto_produce: boolean;
   is_active: boolean;
+  avatar_path: string | null;
+  banner_path: string | null;
   created_at: string;
   updated_at: string;
 }

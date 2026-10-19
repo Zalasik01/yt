@@ -1,4 +1,6 @@
 import type { Request, Response } from 'express';
+import { branding_service } from '../services/branding.service.js';
+import { channel_assist_service } from '../services/channel-assist.service.js';
 import { channel_service } from '../services/channel.service.js';
 import { youtube_service } from '../services/youtube.service.js';
 
@@ -22,6 +24,17 @@ export const channel_controller = {
   async destroy(req: Request, res: Response) {
     await channel_service.remove(req.validated.params.id);
     res.status(204).end();
+  },
+
+  async suggest(req: Request, res: Response) {
+    const { field, ...context } = req.validated.body;
+    res.json({ data: { suggestions: await channel_assist_service.suggest(field, context) } });
+  },
+
+  async generateBranding(req: Request, res: Response) {
+    const { id, kind } = req.validated.params;
+    await branding_service.generate(id, kind);
+    res.json({ data: await channel_service.get(id) });
   },
 
   async youtubeAuthUrl(req: Request, res: Response) {
